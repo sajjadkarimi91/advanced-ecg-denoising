@@ -31,7 +31,7 @@ for m = 1:length(local_db_files)
 
         ecg_in = ecg_noisy(:,ch)';
 
-       
+
         % ecg_in = ecg_den_lti_smoother(ecg_in,2,100);
         % ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
 
@@ -39,13 +39,26 @@ for m = 1:length(local_db_files)
         params = [];
         ecg_rpeaks = zeros(1,length(ecg_in));
         ecg_rpeaks(ecg_rpeaks_index) = 1;
-        % [ecg_in, data_prior_est, n_var] = ecg_den_phase_domain_gp(ecg_in, ecg_rpeaks, params);
-         [ecg_in, data_prior_est, n_var] = ecg_den_time_domain_gp(ecg_in, ecg_rpeaks, params);
+        % % [ecg_in, data_prior_est, n_var] = ecg_den_phase_domain_gp(ecg_in, ecg_rpeaks, params);
+        % % [ecg_in, data_prior_est, n_var] = ecg_den_time_domain_gp(ecg_in, ecg_rpeaks, params);
+        % % ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
 
+
+        % [ecg_in, x_filtered1] = ecg_den_seg_wise_smoother(ecg_in,2, 4*fs, 10);
+        % ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
+
+
+        params.TPTR =  {'sqtwolog'};% {'rigrsure', 'heursure', 'sqtwolog', 'minimaxi'};
+        params.SCAL = {'mln'}; % {'one', 'sln', 'mln'};
+        params.SORH = {'h'};
+        params.WLEVELS = [5,6];
+        [y_med, ecg_in] = ecg_den_wavelet(ecg_in, params);
+        [y_med, ecg_in] = ecg_den_wavelet(ecg_in, params);
         ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
 
         ecg_denoised = ecg(:,ch)' ;
 
+        figure
         plot(t_second,ecg_noisy(:,ch))
         hold on
         plot(t_second,ecg_in)
