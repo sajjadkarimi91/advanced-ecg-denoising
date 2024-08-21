@@ -3,13 +3,12 @@ close all;
 clc;
 
 
-oset_path = 'D:\projects\toolboxes\OSET'; 'D:\my_projects\Alphanumeric\multimodal-cardiac-biomarkers\OSET';% enter the path of OSET toolbox
-addpath(genpath(oset_path))
+emd_path = '.\ECG-EMD-master';% enter the path of OSET toolbox
+addpath(genpath(emd_path))
 
 db_folder = '.\localLU_noisy';
 local_db_files = dir([db_folder '/*.mat']); % list of all mat files
 
-f50 = 50;
 
 for m = 1:length(local_db_files)
 
@@ -32,35 +31,39 @@ for m = 1:length(local_db_files)
         ecg_in = ecg_noisy(:,ch)';
 
 
-%% Find the IMFs
-NR = 80;
-MaxIter = 500;
-tic
-[modes, ~]=ceemdan_v2014(ecg_sig,Nstd,NR,MaxIter,2);
-% modes=emd(ecg_sig);
+        %% Find the IMFs
 
+        sig_power=(var(ecg_in))/2;
+        SNR=0;%dB SNR=5
+        Nstd=sqrt(sig_power/(10^(SNR/10)));
+        T = length(ecg_in)/fs;
+        NR = 80;
+        MaxIter = 500;
+        tic
+        [modes, ~]=ceemdan_v2014(ecg_in,Nstd,NR,MaxIter,2);
+        % modes=emd(ecg_sig);
 
+        % ZCR
+        zcr=zeros(size(modes,1),1);
+        for i=1:size(modes,1)
+            zc=abs(diff(sign(modes(i,:))));
+            zc_nos=length(zc(zc==2));
+            zcr(i)=zc_nos/T;
+        end
 
-
-
-%% ZCR
-zcr=zeros(size(modes,1),1);
-for i=1:size(modes,1)
-    zc=abs(diff(sign(modes(i,:))));
-    zc_nos=length(zc(zc==2));
-    zcr(i)=zc_nos/T;
-end
-
-%% recombine
-ecg_recomb=zeros(1,length(ecg_sig_uncorr));
-bw_est=zeros(1,length(ecg_sig_uncorr));
-for i=1:size(modes,1)
-    if zcr(i)>1.5
-        ecg_recomb=ecg_recomb+modes(i,:);
-    else
-        bw_est=bw_est+modes(i,:);
-    end
-end
+        % recombine
+        ecg_recomb=zeros(1,length(ecg_in));
+        bw_est=zeros(1,length(ecg_in));
+        bw_noise=zeros(1,length(ecg_in));
+        for i=1:size(modes,1)
+            if zcr(i)>1.5 && zcr(i)<100
+                ecg_recomb=ecg_recomb+modes(i,:);
+            elseif zcr(i)<1.5
+                bw_est=bw_est+modes(i,:);
+                elseif zcr(i)>=100
+                bw_noise=bw_noise+modes(i,:);
+            end
+        end
 
 
         ecg_denoised = ecg(:,ch)' ;
@@ -68,7 +71,7 @@ end
         figure
         plot(t_second,ecg_noisy(:,ch))
         hold on
-        plot(t_second,ecg_in)
+        plot(t_second,ecg_recomb)
         plot(t_second,ecg_denoised)
 
     end
