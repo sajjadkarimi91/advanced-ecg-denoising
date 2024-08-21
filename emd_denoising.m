@@ -2,8 +2,8 @@ clear;
 close all;
 clc;
 
-
-emd_path = '.\ECG-EMD-master';% enter the path of OSET toolbox
+% https://github.com/shloked/Denoise-ECG-using-EMD
+emd_path = '.\ECG-EMD-master';% enter the path of EMD toolbox
 addpath(genpath(emd_path))
 
 db_folder = '.\localLU_noisy';
