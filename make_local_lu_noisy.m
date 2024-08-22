@@ -24,7 +24,7 @@ for m = 1:length(local_db_files)
 
     load([db_folder,'/',in_fname,'.mat']);
 
-ecg_noisy = ecg;
+    ecg_noisy = ecg;
     for ch = 1:12
 
         index_R =  true_position(ch).R;
@@ -32,7 +32,7 @@ ecg_noisy = ecg;
 
         ecg_denoised = ecg(:,ch)';
         ecg_denoised = ecg_denoised - movmean(movmedian(ecg_denoised,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
-        
+
         baseline_wander = randn(1,length(ecg_denoised)+5*fs);
         baseline_wander = lp_filter_zero_phase(baseline_wander, 0.1/fs);
         baseline_wander = baseline_wander(5*fs+1:end);

@@ -22,6 +22,15 @@ for m = 1:length(local_db_files)
 
     load([db_folder,'/',in_fname,'.mat']);
 
+    a = figure('Position', [130 130 1500 800]);
+    for i = 1:12
+        subplot(6,2,i)
+        plot(t_second,ecg(:,i),LineWidth=1.5)
+        grid on
+        if i==11 || i==12
+            xlabel('time (sec)',Interpreter='latex',FontSize=16)
+        end
+    end
 
     for ch = 1:12
 
@@ -49,6 +58,8 @@ for m = 1:length(local_db_files)
 
         pause()
     end
+
+
 end
 
 
