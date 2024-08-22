@@ -32,7 +32,7 @@ for m = 1:length(local_db_files)
         ecg_in = ecg_noisy(:,ch)';
 
 
-        % ecg_in = ecg_den_lti_smoother(ecg_in,2,100);
+        % ecg_in = ecg_den_lti_smoother(ecg_in,2,20);
         % ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
 
 
@@ -50,19 +50,32 @@ for m = 1:length(local_db_files)
 
         params.TPTR =  {'sqtwolog'};% {'rigrsure', 'heursure', 'sqtwolog', 'minimaxi'};
         params.SCAL = {'mln'}; % {'one', 'sln', 'mln'};
-        params.SORH = {'h'};
+        params.SORH = {'s'};
         params.WLEVELS = [5,6];
         [y_med, ecg_in] = ecg_den_wavelet(ecg_in, params);
         [y_med, ecg_in] = ecg_den_wavelet(ecg_in, params);
         ecg_in = ecg_in - movmean(movmedian(ecg_in,[round(0.3*fs),round(0.3*fs)]),[round(0.15*fs),round(0.15*fs)]);
 
-        ecg_denoised = ecg(:,ch)' ;
+        ecg_clean = ecg(:,ch)' ;
+        ecg_recomb = ecg_in;
 
         figure
         plot(t_second,ecg_noisy(:,ch))
         hold on
-        plot(t_second,ecg_in)
-        plot(t_second,ecg_denoised)
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        plot(t_second,ecg_clean,LineWidth=1.5)
+        grid on
+        legend({'Noisy','Denoised','Clean'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
+
+        figure
+        plot(t_second,ecg_clean,LineWidth=1.5,Color='#EDB120')
+        hold on
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        grid on
+        legend({'Clean','Denoised'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
+        xlim([6,7.5])
 
     end
 
