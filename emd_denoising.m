@@ -56,24 +56,35 @@ for m = 1:length(local_db_files)
         bw_est=zeros(1,length(ecg_in));
         bw_noise=zeros(1,length(ecg_in));
         for i=1:size(modes,1)
-            if zcr(i)>1.5 && zcr(i)<100
+            if zcr(i)>1.5 && zcr(i)<50
                 ecg_recomb=ecg_recomb+modes(i,:);
             elseif zcr(i)<1.5
                 bw_est=bw_est+modes(i,:);
-                elseif zcr(i)>=100
+            elseif zcr(i)>=50
                 bw_noise=bw_noise+modes(i,:);
             end
         end
 
 
-        ecg_denoised = ecg(:,ch)' ;
+        ecg_clean = ecg(:,ch)' ;
 
         figure
         plot(t_second,ecg_noisy(:,ch))
         hold on
-        plot(t_second,ecg_recomb)
-        plot(t_second,ecg_denoised)
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        plot(t_second,ecg_clean,LineWidth=1.5)
+        grid on
+        legend({'Noisy','Denoised','Clean'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
 
+        figure
+        plot(t_second,ecg_clean,LineWidth=1.5,Color='#EDB120')
+        hold on
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        grid on
+        legend({'Clean','Denoised'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
+        xlim([6,7.5])
     end
 
 
