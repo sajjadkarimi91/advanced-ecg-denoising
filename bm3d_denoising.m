@@ -303,12 +303,25 @@ ecg_pwelch = ecg_raw - movmean(movmedian(ecg_raw,[floor(0.3*fs),floor(0.3*fs)]),
         end
 
         ecg_clean = ecg(:,ch)' ;
+ecg_recomb = ecg_denoised;
 
         figure
         plot(t_second,ecg_noisy(:,ch))
         hold on
-        plot(t_second,ecg_denoised)
-        plot(t_second,ecg_clean)
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        plot(t_second,ecg_clean,LineWidth=1.5)
+        grid on
+        legend({'Noisy','Denoised','Clean'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
+
+        figure
+        plot(t_second,ecg_clean,LineWidth=1.5,Color='#EDB120')
+        hold on
+        plot(t_second,ecg_recomb,LineWidth=1.5)
+        grid on
+        legend({'Clean','Denoised'},'Interpreter' ,'latex','orientation','horizontal','FontSize',14)
+        xlabel('time (sec)',Interpreter='latex',FontSize=14)
+        xlim([6,7.5])
 
     end
 
