@@ -69,6 +69,7 @@ for i=1:size(modes,1)
         bw_est=bw_est+modes(i,:);
     end
 end
+
 % figure(2)
 % plot(t,ecg_recomb,t,ecg_sig_uncorr);
 % title('BW removal')
